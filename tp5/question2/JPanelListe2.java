@@ -10,7 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
-
+import java.util.Stack;
+import java.util.EmptyStackException;
 public class JPanelListe2 extends JPanel implements ActionListener, ItemListener {
 
     private JPanel cmd = new JPanel();
@@ -30,9 +31,8 @@ public class JPanelListe2 extends JPanel implements ActionListener, ItemListener
     private JButton boutonAnnuler = new JButton("annuler");
 
     private TextArea texte = new TextArea();
-
+    private Stack<List<String>> pile =  new Stack<List<String>>();
     private List<String> liste;
-    private List<String> liste2;
     private Map<String, Integer> occurrences;
 
     public JPanelListe2(List<String> liste, Map<String, Integer> occurrences) {
@@ -95,8 +95,9 @@ public class JPanelListe2 extends JPanel implements ActionListener, ItemListener
                 if (occur != null)
                     afficheur.setText(" -->  " + occur + " occurrence(s)");
                 else
-                    afficheur.setText(" -->  ??? ");
+                    afficheur.setText(" -->  0 ");
             }
+             
             texte.setText(liste.toString());
 
         } catch (Exception e) {
@@ -105,13 +106,15 @@ public class JPanelListe2 extends JPanel implements ActionListener, ItemListener
     }
 
     public void itemStateChanged(ItemEvent ie) {
-        this.liste2 = new LinkedList<String>(liste);
-        this.liste2.addAll(liste);
-        if (ie.getSource() == ordreCroissant)
-           Collections.sort(liste);
-        else if (ie.getSource() == ordreDecroissant)
+        if (ie.getSource() == ordreCroissant){
+           pushh();
+                Collections.sort(liste);
+               
+            }
+        else if (ie.getSource() == ordreDecroissant){
+          pushh();
          Collections.sort(liste, new orderClass());
-
+        }
         texte.setText(liste.toString());
     }
 
@@ -129,7 +132,16 @@ public class JPanelListe2 extends JPanel implements ActionListener, ItemListener
                 occurrences.put(s,0);
             }
         }
+        if(!resultat) pile.pop();
+        occurrences = Chapitre2CoreJava2.occurrencesDesMots(liste);
         return resultat;
+    }
+        public void pushh()
+    {
+        List<String> l =  new LinkedList<String>();
+        for(String s:liste)
+            l.add(s);
+        pile.push(l);
     }
     private class orderClass implements Comparator<String>{
         public int compare(String t1,String t2){
